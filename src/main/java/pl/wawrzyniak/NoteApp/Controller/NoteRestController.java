@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.NoteService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/Note/api")
 public class NoteRestController {
@@ -17,5 +19,9 @@ public class NoteRestController {
     @PostMapping("/add")
     public NoteDTO addNote(@RequestBody NoteDTO note){
         return this.noteService.save(note);
+    }
+    @GetMapping("/all")
+    public List<NoteDTO> getAllNotes(){
+        return this.noteService.getAll();
     }
 }

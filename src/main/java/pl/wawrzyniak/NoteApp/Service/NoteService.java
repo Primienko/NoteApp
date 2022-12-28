@@ -7,6 +7,9 @@ import pl.wawrzyniak.NoteApp.Repository.NoteRepository;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.Mappers.NoteMapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class NoteService {
     private NoteRepository noteRepository;
@@ -24,4 +27,9 @@ public class NoteService {
         return this.noteMapper.noteToNoteDTO(savedNote);
     }
 
+    public List<NoteDTO> getAll() {
+        List<Note> list = new ArrayList<>();
+        noteRepository.findAll().forEach(list::add);
+        return this.noteMapper.noteListToDTOList(list);
+    }
 }
