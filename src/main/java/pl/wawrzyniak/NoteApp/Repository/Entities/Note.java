@@ -11,8 +11,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 
-@Entity
 @Data
+@Entity
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,3 +21,5 @@ public class Note {
     @UpdateTimestamp
     private LocalDateTime updateTime;
 }
+
+
