@@ -1,6 +1,8 @@
 package pl.wawrzyniak.NoteApp.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.NoteService;
@@ -8,7 +10,7 @@ import pl.wawrzyniak.NoteApp.Service.NoteService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Note/api")
+@RequestMapping("/Note/api/")
 public class NoteRestController {
     private NoteService noteService;
 
@@ -16,12 +18,18 @@ public class NoteRestController {
     public NoteRestController(NoteService noteService){
         this.noteService = noteService;
     }
-    @PostMapping("/add")
+    @PostMapping("add")
     public NoteDTO addNote(@RequestBody NoteDTO note){
         return this.noteService.save(note);
     }
-    @GetMapping("/all")
+    @GetMapping("all")
     public List<NoteDTO> getAllNotes(){
         return this.noteService.getAll();
+    }
+
+    @DeleteMapping("all")
+    public ResponseEntity delateAll(){
+        this.noteService.delateAll();
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

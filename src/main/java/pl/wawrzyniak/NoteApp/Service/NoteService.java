@@ -32,4 +32,8 @@ public class NoteService {
         noteRepository.findAll().forEach(list::add);
         return this.noteMapper.noteListToDTOList(list);
     }
+
+    public void delateAll() {
+        noteRepository.deleteAll();
+    }
 }
