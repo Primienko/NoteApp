@@ -8,12 +8,13 @@ import lombok.Data;
 import org.hibernate.annotations.UpdateTimestamp;
 
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
 @Data
 @Entity
-public class Note {
+public class Note implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
