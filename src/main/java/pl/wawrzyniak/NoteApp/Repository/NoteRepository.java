@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
 
 @Repository
-public interface NoteRepository extends CrudRepository<Note, Long>, NoteQueryRepositoryInterface {
+public interface NoteRepository extends CrudRepository<Note, Long>, NoteQueryRepository {
 }
