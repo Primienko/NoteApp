@@ -28,12 +28,8 @@ public class NoteRestController {
     public List<NoteDTO> getAllNotes(){
         return this.noteService.getAll();
     }
-    @GetMapping("find")
-    public List<NoteDTO> getByCriteria(@RequestParam(required = false) String text, @RequestParam(required = false)LocalDateTime minUpdateTime, @RequestParam(required = false)LocalDateTime maxUpdateTime){
-        NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();
-        if(!(text == null)) {criteriaDTO.setText(text);}
-        if(!(minUpdateTime == null)) {criteriaDTO.setMinUpdateTime(minUpdateTime);}
-        if(!(maxUpdateTime == null)) {criteriaDTO.setMaxUpdateTime(maxUpdateTime);}
+    @PostMapping("find")
+    public List<NoteDTO> getByCriteria(@RequestBody NoteCriteriaDTO criteriaDTO){
         return this.noteService.getByCriteria(criteriaDTO);
     }
     @DeleteMapping("all")

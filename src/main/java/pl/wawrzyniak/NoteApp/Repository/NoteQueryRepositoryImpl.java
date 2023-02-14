@@ -22,16 +22,16 @@ public class NoteQueryRepositoryImpl implements NoteQueryRepository {
         CriteriaQuery<Note> criteriaQuery = criteriaBuilder.createQuery(Note.class);
         Root<Note> root = criteriaQuery.from(Note.class);
         List<Predicate> predicates = new ArrayList<>();
-        if(!(criteria.getText() == null)) {
+        if(criteria.getText() != null) {
             Predicate containsText = criteriaBuilder.like(root.get("text"), "%" + criteria.getText() + "%");
             predicates.add(containsText);
         }
-        if(!(criteria.getMaxUpdateTime() == null)) {
-            Predicate earlierThan = criteriaBuilder.lessThan(root.get("updateTime"), criteria.getMaxUpdateTime());
+        if(criteria.getMaxUpdateTime() != null) {
+            Predicate earlierThan = criteriaBuilder.lessThanOrEqualTo(root.get("updateTime"), criteria.getMaxUpdateTime());
             predicates.add(earlierThan);
         }
-        if(!(criteria.getMinUpdateTime() == null)) {
-            Predicate laterThan = criteriaBuilder.greaterThan(root.get("updateTime"), criteria.getMinUpdateTime());
+        if(criteria.getMinUpdateTime() != null) {
+            Predicate laterThan = criteriaBuilder.greaterThanOrEqualTo(root.get("updateTime"), criteria.getMinUpdateTime());
             predicates.add(laterThan);
         }
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[]{}));
