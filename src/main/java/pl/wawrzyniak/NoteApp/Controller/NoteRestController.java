@@ -4,15 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateExpetion;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.NoteService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Note/api/")
+@RequestMapping("/api/note")
 public class NoteRestController {
     private NoteService noteService;
 
@@ -20,19 +20,21 @@ public class NoteRestController {
     public NoteRestController(NoteService noteService){
         this.noteService = noteService;
     }
-    @PostMapping("add")
+    @PostMapping("")
     public NoteDTO addNote(@RequestBody NoteDTO note){
         return this.noteService.save(note);
     }
-    @GetMapping("all")
+    @GetMapping("/all")
     public List<NoteDTO> getAllNotes(){
         return this.noteService.getAll();
     }
-    @PostMapping("find")
-    public List<NoteDTO> getByCriteria(@RequestBody NoteCriteriaDTO criteriaDTO){
+
+    @PostMapping("/find")
+    public List<NoteDTO> getByCriteria(@RequestBody NoteCriteriaDTO criteriaDTO) throws EmptyPredicateExpetion {
         return this.noteService.getByCriteria(criteriaDTO);
     }
-    @DeleteMapping("all")
+
+    @DeleteMapping("/all")
     public ResponseEntity delateAll(){
         this.noteService.delateAll();
         return new ResponseEntity(HttpStatus.OK);
