@@ -8,7 +8,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import pl.wawrzyniak.NoteApp.Criteria.NoteCriteria;
-import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateExpetion;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
 import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class NoteQueryRepositoryImpl implements NoteQueryRepository {
     @PersistenceContext
     private EntityManager entityManager;
     @Override
-    public List<Note> findByCriteria(NoteCriteria criteria) throws EmptyPredicateExpetion {
+    public List<Note> findByCriteria(NoteCriteria criteria) throws EmptyPredicateException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Note> criteriaQuery = criteriaBuilder.createQuery(Note.class);
         Root<Note> root = criteriaQuery.from(Note.class);
@@ -35,7 +35,7 @@ public class NoteQueryRepositoryImpl implements NoteQueryRepository {
             Predicate laterThan = criteriaBuilder.greaterThanOrEqualTo(root.get("updateTime"), criteria.getMinUpdateTime());
             predicates.add(laterThan);
         }
-        if(predicates.isEmpty()) {throw new EmptyPredicateExpetion("Your search parameters can't be empty");}
+        if(predicates.isEmpty()) {throw new EmptyPredicateException("Your search parameters can't be empty");}
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[]{}));
         TypedQuery<Note> query = entityManager.createQuery(criteriaQuery);
         return query.getResultList();

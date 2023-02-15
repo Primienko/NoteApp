@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateExpetion;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.NoteService;
@@ -30,7 +30,7 @@ public class NoteRestController {
     }
 
     @PostMapping("/find")
-    public List<NoteDTO> getByCriteria(@RequestBody NoteCriteriaDTO criteriaDTO) throws EmptyPredicateExpetion {
+    public List<NoteDTO> getByCriteria(@RequestBody NoteCriteriaDTO criteriaDTO) throws EmptyPredicateException {
         return this.noteService.getByCriteria(criteriaDTO);
     }
 

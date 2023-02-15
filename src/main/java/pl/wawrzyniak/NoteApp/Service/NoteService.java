@@ -3,7 +3,7 @@ package pl.wawrzyniak.NoteApp.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.wawrzyniak.NoteApp.Criteria.NoteCriteria;
-import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateExpetion;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
 import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
 import pl.wawrzyniak.NoteApp.Repository.NoteRepository;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
@@ -43,7 +43,7 @@ public class NoteService {
         noteRepository.deleteAll();
     }
 
-    public List<NoteDTO> getByCriteria(NoteCriteriaDTO criteriaDTO) throws EmptyPredicateExpetion {
+    public List<NoteDTO> getByCriteria(NoteCriteriaDTO criteriaDTO) throws EmptyPredicateException {
         NoteCriteria criteria = criteriaMapper.dtoToCriteria(criteriaDTO);
         return noteMapper.noteListToDTOList(noteRepository.findByCriteria(criteria));
     }
