@@ -237,4 +237,22 @@ class NoteAppApplicationTests {
 		// then
 		assertEquals(2, result.length);
 	}
+
+	@Test
+	void emptyPredicateTest() throws JSONException {
+		// given
+
+		// when
+		NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();;
+		int status = given()
+				.when()
+				.body(criteriaToJson(criteriaDTO))
+				.contentType(ContentType.JSON)
+				.post("/api/note/find")
+				.statusCode();
+
+		// then
+		assertEquals(400, status);
+
+	}
 }
