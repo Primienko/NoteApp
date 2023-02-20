@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyNoteException;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.VerificationException;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.NoteService;
@@ -21,7 +23,7 @@ public class NoteRestController {
         this.noteService = noteService;
     }
     @PostMapping("")
-    public NoteDTO addNote(@RequestBody NoteDTO note){
+    public NoteDTO addNote(@RequestBody NoteDTO note) throws VerificationException {
         return this.noteService.save(note);
     }
     @GetMapping("/all")

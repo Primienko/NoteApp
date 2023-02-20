@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.wawrzyniak.NoteApp.Controller.NoteRestController;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyNoteException;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 
@@ -27,6 +28,14 @@ class NoteAppApplicationTests {
 	@Autowired
 	NoteRestController noteRestController;
 
+
+	private static void sleep(int ms){
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
 
 	private static String noteDtoToJson(NoteDTO noteDTO) throws JSONException {
 		JSONObject json = new JSONObject();
@@ -68,9 +77,6 @@ class NoteAppApplicationTests {
 		noteRestController.delateAll();
 	}
 
-	@Test
-	void contextLoads() {
-	}
 
 	@Test
 	void saveOneNoteTest() throws JSONException {
@@ -86,6 +92,24 @@ class NoteAppApplicationTests {
 		assertNotNull(result.getId());
 		assertNotNull(result.getUpdateTime());
 		assertEquals(noteContent, result.getText());
+	}
+
+	@Test
+	void saveEmptyNoteTest() throws JSONException {
+		//given
+		NoteDTO note = new NoteDTO();
+		String noteContent = "";
+		note.setText(noteContent);
+		String json = noteDtoToJson(note);
+
+		// when
+		int response = given()
+				.body(json).contentType(ContentType.JSON)
+				.post("/api/note").statusCode();
+
+		//then
+		assertEquals(400, response);
+
 	}
 
 	@Test
@@ -176,13 +200,6 @@ class NoteAppApplicationTests {
 		assertEquals(value, result.length);
 	}
 
-	private static void sleep(int ms){
-		try {
-			Thread.sleep(ms);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
-	}
 	@Test
 	void findByMinDateTest() throws JSONException {
 		// given
@@ -224,9 +241,9 @@ class NoteAppApplicationTests {
 		String noteContent3 = "Test v3 *";
 		note3.setText(noteContent3);
 		note1 = saveOneNote(note1);
-		sleep(100);
+		sleep(150);
 		note2 = saveOneNote(note2);
-		sleep(100);
+		sleep(150);
 		note3 = saveOneNote(note3);
 
 		// when
