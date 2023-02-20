@@ -37,8 +37,14 @@ public class NoteRestController {
     }
 
     @DeleteMapping("/all")
-    public ResponseEntity delateAll(){
-        this.noteService.delateAll();
+    public ResponseEntity deleteAll(){
+        this.noteService.deleteAll();
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity deleteOne(@RequestParam Long id){
+        this.noteService.deleteById(id);
         return new ResponseEntity(HttpStatus.OK);
     }
 

@@ -48,7 +48,7 @@ public class NoteService {
         return this.noteMapper.noteListToDTOList(list);
     }
 
-    public void delateAll() {
+    public void deleteAll() {
         noteRepository.deleteAll();
     }
 
@@ -66,5 +66,9 @@ public class NoteService {
         updateNote.setText(noteDTO.getText());
         Note savedNote =  noteRepository.save(updateNote);
         return this.noteMapper.noteToNoteDTO(savedNote);
+    }
+
+    public void deleteById(Long id){
+        this.noteRepository.deleteById(id);
     }
 }

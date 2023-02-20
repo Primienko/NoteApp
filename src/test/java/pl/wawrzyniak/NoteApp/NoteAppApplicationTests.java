@@ -73,7 +73,7 @@ class NoteAppApplicationTests {
 	}
 	@BeforeEach
 	void prepareCleanDB() {
-		noteRestController.delateAll();
+		noteRestController.deleteAll();
 	}
 
 
@@ -117,7 +117,6 @@ class NoteAppApplicationTests {
 		NoteDTO note = new NoteDTO();
 		String noteContent = "Test Message";
 		note.setText(noteContent);
-		String json = noteDtoToJson(note);
 
 		NoteDTO result = saveOneNote(note);
 
@@ -138,6 +137,26 @@ class NoteAppApplicationTests {
 		assertEquals(editedContent, editedResult.getText());
 	}
 
+	@Test
+	void delateNoteTest() throws JSONException {
+		// given
+		NoteDTO note = new NoteDTO();
+		String noteContent = "Test Message";
+		note.setText(noteContent);
+		NoteDTO savedNote = saveOneNote(note);
+
+		// when
+		given()
+				.when()
+				.delete("/api/note?id=" + savedNote.getId())
+				.then()
+				.statusCode(200);
+
+
+		// then
+		NoteDTO[] result = given().when().get("/api/note/all").then().statusCode(200).extract().as(NoteDTO[].class);
+		assertEquals(0, result.length);
+	}
 	@Test
 	void getAllNotesTest() throws JSONException {
 		// given
