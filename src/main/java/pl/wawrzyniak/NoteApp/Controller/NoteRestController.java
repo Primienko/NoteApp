@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyNoteException;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.NoteNotExistsException;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.VerificationException;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
@@ -40,5 +40,10 @@ public class NoteRestController {
     public ResponseEntity delateAll(){
         this.noteService.delateAll();
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PostMapping("/update")
+    public NoteDTO updateNote(@RequestBody NoteDTO noteDTO) throws NoteNotExistsException {
+        return this.noteService.update(noteDTO);
     }
 }

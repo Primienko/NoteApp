@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.wawrzyniak.NoteApp.Controller.NoteRestController;
-import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyNoteException;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 
@@ -110,6 +109,33 @@ class NoteAppApplicationTests {
 		//then
 		assertEquals(400, response);
 
+	}
+
+	@Test
+	void editNoteTest() throws JSONException {
+		// given
+		NoteDTO note = new NoteDTO();
+		String noteContent = "Test Message";
+		note.setText(noteContent);
+		String json = noteDtoToJson(note);
+
+		NoteDTO result = saveOneNote(note);
+
+		NoteDTO editedNote = new NoteDTO();
+		String editedContent = "New Message";
+		editedNote.setText(editedContent);
+		editedNote.setId(result.getId());
+		// when
+		String editedJson = noteDtoToJson(editedNote);
+		NoteDTO editedResult = given()
+				.body(editedJson).contentType(ContentType.JSON)
+				.post("/api/note")
+				.then()
+				.statusCode(200)
+				.extract().as(NoteDTO.class);
+
+		// then
+		assertEquals(editedContent, editedResult.getText());
 	}
 
 	@Test
@@ -260,7 +286,7 @@ class NoteAppApplicationTests {
 		// given
 
 		// when
-		NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();;
+		NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();
 		int status = given()
 				.when()
 				.body(criteriaToJson(criteriaDTO))

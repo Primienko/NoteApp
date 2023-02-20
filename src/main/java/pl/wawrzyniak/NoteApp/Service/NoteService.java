@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.wawrzyniak.NoteApp.Criteria.NoteCriteria;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
+import pl.wawrzyniak.NoteApp.Repository.CustomExeption.NoteNotExistsException;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.VerificationException;
 import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
 import pl.wawrzyniak.NoteApp.Repository.NoteRepository;
@@ -15,6 +16,7 @@ import pl.wawrzyniak.NoteApp.Service.Verifier.NoteVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NoteService {
@@ -53,5 +55,16 @@ public class NoteService {
     public List<NoteDTO> getByCriteria(NoteCriteriaDTO criteriaDTO) throws EmptyPredicateException {
         NoteCriteria criteria = criteriaMapper.dtoToCriteria(criteriaDTO);
         return noteMapper.noteListToDTOList(noteRepository.findByCriteria(criteria));
+    }
+
+    public NoteDTO update(NoteDTO noteDTO) throws NoteNotExistsException {
+        Optional<Note> note = noteRepository.findById(noteDTO.getId());
+        if(note.isEmpty()) {
+            throw new NoteNotExistsException();
+        }
+        Note updateNote = note.get();
+        updateNote.setText(noteDTO.getText());
+        Note savedNote =  noteRepository.save(updateNote);
+        return this.noteMapper.noteToNoteDTO(savedNote);
     }
 }
