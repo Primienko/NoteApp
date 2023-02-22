@@ -283,9 +283,9 @@ class NoteAppApplicationTests {
 		String noteContent3 = "Test v3 *";
 		note3.setText(noteContent3);
 		note1 = saveOneNote(note1);
-		sleep(100);
+		sleep(300);
 		note2 = saveOneNote(note2);
-		sleep(100);
+		sleep(300);
 		note3 = saveOneNote(note3);
 
 		// when
@@ -311,9 +311,9 @@ class NoteAppApplicationTests {
 		String noteContent3 = "Test v3 *";
 		note3.setText(noteContent3);
 		note1 = saveOneNote(note1);
-		sleep(150);
+		sleep(300);
 		note2 = saveOneNote(note2);
-		sleep(150);
+		sleep(300);
 		note3 = saveOneNote(note3);
 
 		// when
