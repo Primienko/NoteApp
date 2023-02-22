@@ -39,6 +39,8 @@ class NoteAppApplicationTests {
 	private static String noteDtoToJson(NoteDTO noteDTO) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("text", noteDTO.getText());
+		json.put("id", noteDTO.getId());
+		json.put("version", noteDTO.getVersion());
 		return json.toString();
 	}
 
@@ -112,6 +114,28 @@ class NoteAppApplicationTests {
 	}
 
 	@Test
+	void optimisticLockingTest() throws JSONException {
+		NoteDTO note = new NoteDTO();
+		String noteContent = "Test Message";
+		note.setText(noteContent);
+
+		NoteDTO result = saveOneNote(note);
+
+		NoteDTO editedNote = new NoteDTO();
+		String editedContent = "New Message";
+		editedNote.setText(editedContent);
+		editedNote.setVersion(2137);
+		editedNote.setId(result.getId());
+		// when
+		String editedJson = noteDtoToJson(editedNote);
+		int statusCode = given()
+				.body(editedJson).contentType(ContentType.JSON)
+				.post("/api/note/update").statusCode();
+
+		// then
+		assertEquals(409, statusCode);
+	}
+	@Test
 	void editNoteTest() throws JSONException {
 		// given
 		NoteDTO note = new NoteDTO();
@@ -124,11 +148,12 @@ class NoteAppApplicationTests {
 		String editedContent = "New Message";
 		editedNote.setText(editedContent);
 		editedNote.setId(result.getId());
+		editedNote.setVersion(result.getVersion());
 		// when
 		String editedJson = noteDtoToJson(editedNote);
 		NoteDTO editedResult = given()
 				.body(editedJson).contentType(ContentType.JSON)
-				.post("/api/note")
+				.post("/api/note/update")
 				.then()
 				.statusCode(200)
 				.extract().as(NoteDTO.class);

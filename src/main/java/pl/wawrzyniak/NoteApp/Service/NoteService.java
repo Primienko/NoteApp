@@ -62,10 +62,8 @@ public class NoteService {
         if(note.isEmpty()) {
             throw new NoteNotExistsException();
         }
-        Note updateNote = note.get();
-        updateNote.setText(noteDTO.getText());
-        Note savedNote =  noteRepository.save(updateNote);
-        return this.noteMapper.noteToNoteDTO(savedNote);
+        Note noteToUpdate = this.noteMapper.noteDTOToNote(noteDTO);
+        return this.noteMapper.noteToNoteDTO(noteRepository.save(noteToUpdate));
     }
 
     public void deleteById(Long id){
