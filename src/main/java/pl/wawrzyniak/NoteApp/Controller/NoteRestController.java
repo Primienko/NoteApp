@@ -9,6 +9,8 @@ import pl.wawrzyniak.NoteApp.Repository.CustomExeption.NoteNotExistsException;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.VerificationException;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
+import pl.wawrzyniak.NoteApp.Service.DTO.Page;
+import pl.wawrzyniak.NoteApp.Service.DTO.PaginationInfo;
 import pl.wawrzyniak.NoteApp.Service.NoteService;
 
 import java.util.List;
@@ -51,5 +53,10 @@ public class NoteRestController {
     @PostMapping("/update")
     public NoteDTO updateNote(@RequestBody NoteDTO noteDTO) throws NoteNotExistsException {
         return this.noteService.update(noteDTO);
+    }
+
+    @PostMapping("/allPaginated")
+    public Page getPaginated(@RequestBody PaginationInfo info){
+        return this.noteService.getAllPaginated(info);
     }
 }

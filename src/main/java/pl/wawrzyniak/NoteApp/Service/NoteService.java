@@ -10,6 +10,8 @@ import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
 import pl.wawrzyniak.NoteApp.Repository.NoteRepository;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
+import pl.wawrzyniak.NoteApp.Service.DTO.Page;
+import pl.wawrzyniak.NoteApp.Service.DTO.PaginationInfo;
 import pl.wawrzyniak.NoteApp.Service.Mappers.CriteriaMapper;
 import pl.wawrzyniak.NoteApp.Service.Mappers.NoteMapper;
 import pl.wawrzyniak.NoteApp.Service.Verifier.NoteVerifier;
@@ -55,6 +57,19 @@ public class NoteService {
     public List<NoteDTO> getByCriteria(NoteCriteriaDTO criteriaDTO) throws EmptyPredicateException {
         NoteCriteria criteria = criteriaMapper.dtoToCriteria(criteriaDTO);
         return noteMapper.noteListToDTOList(noteRepository.findByCriteria(criteria));
+    }
+
+    public Page getAllPaginated(PaginationInfo info){
+        List<NoteDTO> notes = noteMapper.noteListToDTOList(noteRepository.getAllPaginated(info.getOffset(), info.getPageNumber(), info.getPageSize()));
+        PaginationInfo updatedInfo = new PaginationInfo();
+        updatedInfo.setOffset(info.getOffset());
+        updatedInfo.setPageSize(info.getPageSize());
+        updatedInfo.setPageNumber(info.getPageNumber());
+        updatedInfo.setAllPages((int) noteRepository.count() / info.getPageSize());
+        Page page = new Page();
+        page.setNotes(notes);
+        page.setPaginationInfo(updatedInfo);
+        return page;
     }
 
     public NoteDTO update(NoteDTO noteDTO) throws NoteNotExistsException {

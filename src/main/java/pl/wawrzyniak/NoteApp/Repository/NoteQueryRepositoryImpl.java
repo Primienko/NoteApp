@@ -10,6 +10,7 @@ import jakarta.persistence.criteria.Root;
 import pl.wawrzyniak.NoteApp.Criteria.NoteCriteria;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
 import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
+import pl.wawrzyniak.NoteApp.Service.DTO.PaginationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,19 @@ public class NoteQueryRepositoryImpl implements NoteQueryRepository {
         if(predicates.isEmpty()) {throw new EmptyPredicateException("Your search parameters can't be empty");}
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[]{}));
         TypedQuery<Note> query = entityManager.createQuery(criteriaQuery);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Note> getAllPaginated(int offset, int page, int size){
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Note> criteriaQuery = criteriaBuilder.createQuery(Note.class);
+        Root<Note> root = criteriaQuery.from(Note.class);
+        criteriaQuery.select(root);
+        int start = size * page + offset;
+        TypedQuery<Note> query = entityManager.createQuery(criteriaQuery)
+                .setFirstResult(start)
+                .setMaxResults(size);
         return query.getResultList();
     }
 }
