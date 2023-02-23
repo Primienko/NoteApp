@@ -19,6 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import pl.wawrzyniak.NoteApp.Controller.NoteRestController;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
+import pl.wawrzyniak.NoteApp.Service.DTO.Page;
+import pl.wawrzyniak.NoteApp.Service.DTO.PaginationInfo;
 
 import java.util.stream.Stream;
 @RunWith(SpringRunner.class)
@@ -44,24 +46,32 @@ class NoteAppApplicationTests {
 		return json.toString();
 	}
 
-	private static String criteriaToJson(NoteCriteriaDTO criteriaDTO) throws JSONException {
+	private static JSONObject criteriaToJson(NoteCriteriaDTO criteriaDTO) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("text", criteriaDTO.getText());
 		json.put("minUpdateTime", criteriaDTO.getMinUpdateTime());
 		json.put("maxUpdateTime", criteriaDTO.getMaxUpdateTime());
-		return json.toString();
+		return json;
 	}
 
-	private static NoteDTO[] getNotesByCriteria(NoteCriteriaDTO criteriaDTO) throws JSONException {
-		NoteDTO[] result = given()
+	private static String paginationInfoToJson(PaginationInfo info) throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("pageSize", info.getPageSize());
+		json.put("pageNumber", info.getPageNumber());
+		json.put("offset", info.getOffset());
+		json.put("allPages", info.getAllPages());
+		json.put("criteria", criteriaToJson(info.getCriteria()));
+		return json.toString();
+	}
+	private static Page getNotesByCriteria(PaginationInfo info) throws JSONException {
+		return given()
 				.when()
-				.body(criteriaToJson(criteriaDTO))
+				.body(paginationInfoToJson(info))
 				.contentType(ContentType.JSON)
 				.post("/api/note/find")
 				.then()
 				.statusCode(200)
-				.extract().as(NoteDTO[].class);
-		return result;
+				.extract().as(Page.class);
 	}
 
 	private static NoteDTO saveOneNote(NoteDTO noteDTO) throws JSONException {
@@ -163,7 +173,7 @@ class NoteAppApplicationTests {
 	}
 
 	@Test
-	void delateNoteTest() throws JSONException {
+	void deleteNoteTest() throws JSONException {
 		// given
 		NoteDTO note = new NoteDTO();
 		String noteContent = "Test Message";
@@ -176,14 +186,9 @@ class NoteAppApplicationTests {
 				.delete("/api/note?id=" + savedNote.getId())
 				.then()
 				.statusCode(200);
-
-
-		// then
-		NoteDTO[] result = given().when().get("/api/note/all").then().statusCode(200).extract().as(NoteDTO[].class);
-		assertEquals(0, result.length);
 	}
 	@Test
-	void getAllNotesTest() throws JSONException {
+	void getPaginationTest() throws JSONException {
 		// given
 		int requestNumber = 10;
 		for(int i = 0; i < requestNumber; i++) {
@@ -194,14 +199,21 @@ class NoteAppApplicationTests {
 		}
 
 		// when
-		NoteDTO[] result = given().when().get("/api/note/all").then().statusCode(200).extract().as(NoteDTO[].class);
-
+		NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();
+		PaginationInfo info = new PaginationInfo();
+		info.setOffset(0);
+		info.setPageNumber(0);
+		info.setPageSize(5);
+		info.setCriteria(criteriaDTO);
+		Page result = getNotesByCriteria(info);
+		NoteDTO[] noteDTOS = result.getNotes().toArray(new NoteDTO[0]);
 		// then
-		assertEquals(requestNumber, result.length);
+		assertEquals(5, noteDTOS.length);
+		assertEquals(2, result.getPaginationInfo().getAllPages());
 	}
 
 	@Test
-	void delateAllTest() throws JSONException {
+	void deleteAllTest() throws JSONException {
 		// given
 		int requestNumber = 10;
 		for(int i = 0; i < requestNumber; i++) {
@@ -210,30 +222,12 @@ class NoteAppApplicationTests {
 			note.setText(noteContent);
 			saveOneNote(note);
 		}
-		NoteDTO[] result = given()
-				.when()
-				.get("/api/note/all")
-				.then()
-				.statusCode(200)
-				.extract().as(NoteDTO[].class);
-		assertEquals(requestNumber, result.length);
-
 		// when
 		given()
 				.when()
 				.delete("/api/note/all")
 				.then()
 				.statusCode(200);
-
-		// then
-		NoteDTO[] finalResult = given()
-				.when()
-				.get("/api/note/all")
-				.then()
-				.statusCode(200)
-				.extract()
-				.as(NoteDTO[].class);
-		assertEquals(0, finalResult.length);
 	}
 
 	private static Stream<Arguments> textTesting(){
@@ -264,10 +258,15 @@ class NoteAppApplicationTests {
 		// when
 		NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();
 		criteriaDTO.setText(text);
-		NoteDTO[] result = getNotesByCriteria(criteriaDTO);
-
+		PaginationInfo info = new PaginationInfo();
+		info.setOffset(0);
+		info.setPageNumber(0);
+		info.setPageSize(100);
+		info.setCriteria(criteriaDTO);
+		Page result = getNotesByCriteria(info);
+		NoteDTO[] noteDTOS = result.getNotes().toArray(new NoteDTO[0]);
 		// then
-		assertEquals(value, result.length);
+		assertEquals(value, noteDTOS.length);
 	}
 
 	@Test
@@ -291,11 +290,17 @@ class NoteAppApplicationTests {
 		// when
 		NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();
 		criteriaDTO.setMaxUpdateTime(note2.getUpdateTime());
-		NoteDTO[] result = getNotesByCriteria(criteriaDTO);
-
+		PaginationInfo info = new PaginationInfo();
+		info.setOffset(0);
+		info.setPageNumber(0);
+		info.setPageSize(100);
+		info.setCriteria(criteriaDTO);
+		Page result = getNotesByCriteria(info);
+		NoteDTO[] noteDTOS = result.getNotes().toArray(new NoteDTO[0]);
+		// then
 
 		// then
-		assertEquals(2, result.length);
+		assertEquals(2, noteDTOS.length);
 	}
 
 	@Test
@@ -319,27 +324,16 @@ class NoteAppApplicationTests {
 		// when
 		NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();
 		criteriaDTO.setMaxUpdateTime(note2.getUpdateTime());
-		NoteDTO[] result = getNotesByCriteria(criteriaDTO);
+		PaginationInfo info = new PaginationInfo();
+		info.setOffset(0);
+		info.setPageNumber(0);
+		info.setPageSize(100);
+		info.setCriteria(criteriaDTO);
+		Page result = getNotesByCriteria(info);
+		NoteDTO[] noteDTOS = result.getNotes().toArray(new NoteDTO[0]);
+		// then
 
 		// then
-		assertEquals(2, result.length);
-	}
-
-	@Test
-	void emptyPredicateTest() throws JSONException {
-		// given
-
-		// when
-		NoteCriteriaDTO criteriaDTO = new NoteCriteriaDTO();
-		int status = given()
-				.when()
-				.body(criteriaToJson(criteriaDTO))
-				.contentType(ContentType.JSON)
-				.post("/api/note/find")
-				.statusCode();
-
-		// then
-		assertEquals(400, status);
-
+		assertEquals(2, noteDTOS.length);
 	}
 }

@@ -3,12 +3,10 @@ package pl.wawrzyniak.NoteApp.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.wawrzyniak.NoteApp.Criteria.NoteCriteria;
-import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.NoteNotExistsException;
 import pl.wawrzyniak.NoteApp.Repository.CustomExeption.VerificationException;
 import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
 import pl.wawrzyniak.NoteApp.Repository.NoteRepository;
-import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.Page;
 import pl.wawrzyniak.NoteApp.Service.DTO.PaginationInfo;
@@ -44,28 +42,22 @@ public class NoteService {
         return this.noteMapper.noteToNoteDTO(savedNote);
     }
 
-    public List<NoteDTO> getAll() {
-        List<Note> list = new ArrayList<>();
-        noteRepository.findAllByOrderByUpdateTimeDesc().forEach(list::add);
-        return this.noteMapper.noteListToDTOList(list);
-    }
-
     public void deleteAll() {
         noteRepository.deleteAll();
     }
 
-    public List<NoteDTO> getByCriteria(NoteCriteriaDTO criteriaDTO) throws EmptyPredicateException {
-        NoteCriteria criteria = criteriaMapper.dtoToCriteria(criteriaDTO);
-        return noteMapper.noteListToDTOList(noteRepository.findByCriteria(criteria));
-    }
-
-    public Page getAllPaginated(PaginationInfo info){
-        List<NoteDTO> notes = noteMapper.noteListToDTOList(noteRepository.getAllPaginated(info.getOffset(), info.getPageNumber(), info.getPageSize()));
+    public Page getByCriteria(PaginationInfo info){
+        NoteCriteria criteria = criteriaMapper.dtoToCriteria(info.getCriteria());
+        List<NoteDTO> notes = noteMapper.noteListToDTOList(noteRepository.findByCriteria(criteria, info.getOffset(), info.getPageNumber(), info.getPageSize()));
         PaginationInfo updatedInfo = new PaginationInfo();
         updatedInfo.setOffset(info.getOffset());
         updatedInfo.setPageSize(info.getPageSize());
         updatedInfo.setPageNumber(info.getPageNumber());
-        updatedInfo.setAllPages((int) noteRepository.count() / info.getPageSize());
+        updatedInfo.setCriteria(info.getCriteria());
+        updatedInfo.setAllPages(noteRepository.count() / updatedInfo.getPageSize());
+        if(noteRepository.count() % updatedInfo.getPageSize() > 0){
+            updatedInfo.setAllPages(updatedInfo.getAllPages() + 1);
+        }
         Page page = new Page();
         page.setNotes(notes);
         page.setPaginationInfo(updatedInfo);

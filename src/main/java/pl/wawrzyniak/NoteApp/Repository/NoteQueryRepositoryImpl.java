@@ -8,9 +8,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import pl.wawrzyniak.NoteApp.Criteria.NoteCriteria;
-import pl.wawrzyniak.NoteApp.Repository.CustomExeption.EmptyPredicateException;
 import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
-import pl.wawrzyniak.NoteApp.Service.DTO.PaginationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +17,26 @@ public class NoteQueryRepositoryImpl implements NoteQueryRepository {
     @PersistenceContext
     private EntityManager entityManager;
     @Override
-    public List<Note> findByCriteria(NoteCriteria criteria) throws EmptyPredicateException {
+    public List<Note> findByCriteria(NoteCriteria criteria, int offset, int page, int size){
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Note> criteriaQuery = criteriaBuilder.createQuery(Note.class);
         Root<Note> root = criteriaQuery.from(Note.class);
+        List<Predicate> predicates = getPredicatesListFromCriteria(criteria, criteriaBuilder, root);
+        if(predicates.isEmpty()) {
+            criteriaQuery.select(root)
+                    .orderBy(criteriaBuilder.desc(root.get("updateTime")));
+        } else {
+            criteriaQuery.select(root)
+                    .where(predicates.toArray(new Predicate[]{}))
+                    .orderBy(criteriaBuilder.desc(root.get("updateTime")));
+        }
+        TypedQuery<Note> query = entityManager.createQuery(criteriaQuery)
+                .setFirstResult(size * page + offset)
+                .setMaxResults(size);
+        return query.getResultList();
+    }
+
+    private static List<Predicate> getPredicatesListFromCriteria(NoteCriteria criteria, CriteriaBuilder criteriaBuilder, Root<Note> root) {
         List<Predicate> predicates = new ArrayList<>();
         if(criteria.getText() != null) {
             Predicate containsText = criteriaBuilder.like(root.get("text"), "%" + criteria.getText() + "%");
@@ -36,22 +50,6 @@ public class NoteQueryRepositoryImpl implements NoteQueryRepository {
             Predicate laterThan = criteriaBuilder.greaterThanOrEqualTo(root.get("updateTime"), criteria.getMinUpdateTime());
             predicates.add(laterThan);
         }
-        if(predicates.isEmpty()) {throw new EmptyPredicateException("Your search parameters can't be empty");}
-        criteriaQuery.select(root).where(predicates.toArray(new Predicate[]{}));
-        TypedQuery<Note> query = entityManager.createQuery(criteriaQuery);
-        return query.getResultList();
-    }
-
-    @Override
-    public List<Note> getAllPaginated(int offset, int page, int size){
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Note> criteriaQuery = criteriaBuilder.createQuery(Note.class);
-        Root<Note> root = criteriaQuery.from(Note.class);
-        criteriaQuery.select(root);
-        int start = size * page + offset;
-        TypedQuery<Note> query = entityManager.createQuery(criteriaQuery)
-                .setFirstResult(start)
-                .setMaxResults(size);
-        return query.getResultList();
+        return predicates;
     }
 }
