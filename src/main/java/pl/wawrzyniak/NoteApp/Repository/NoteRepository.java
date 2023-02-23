@@ -6,5 +6,4 @@ import pl.wawrzyniak.NoteApp.Repository.Entities.Note;
 
 @Repository
 public interface NoteRepository extends CrudRepository<Note, Long>, NoteQueryRepository {
-    Iterable<Note> findAllByOrderByUpdateTimeDesc();
 }
