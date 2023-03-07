@@ -18,7 +18,7 @@ public class GeneralExceptionHandler {
 
     @ExceptionHandler(value = NoteNotExistsException.class)
     public ResponseEntity missingNote(){
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = EmptyNoteException.class)

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.UpdateTimestamp;
 
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 

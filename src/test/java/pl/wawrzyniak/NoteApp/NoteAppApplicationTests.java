@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.wawrzyniak.NoteApp.Controller.NoteRestController;
+import pl.wawrzyniak.NoteApp.Repository.NoteRepository;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteCriteriaDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.Page;
@@ -28,6 +29,8 @@ import java.util.stream.Stream;
 class NoteAppApplicationTests {
 	@Autowired
 	NoteRestController noteRestController;
+	@Autowired
+	NoteRepository noteRepository;
 
 
 	private static void sleep(int ms){
@@ -186,6 +189,13 @@ class NoteAppApplicationTests {
 				.delete("/api/note?id=" + savedNote.getId())
 				.then()
 				.statusCode(200);
+
+		int result = given()
+				.when()
+				.delete("/api/note?id=" + savedNote.getId()).statusCode();
+
+		// then
+		assertEquals(400, result);
 	}
 	@Test
 	void getPaginationTest() throws JSONException {
@@ -228,6 +238,10 @@ class NoteAppApplicationTests {
 				.delete("/api/note/all")
 				.then()
 				.statusCode(200);
+
+		// then
+		long notesNumber = noteRepository.count();
+		assertEquals(0, notesNumber);
 	}
 
 	private static Stream<Arguments> textTesting(){

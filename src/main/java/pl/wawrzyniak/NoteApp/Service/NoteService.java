@@ -14,7 +14,6 @@ import pl.wawrzyniak.NoteApp.Service.Mappers.CriteriaMapper;
 import pl.wawrzyniak.NoteApp.Service.Mappers.NoteMapper;
 import pl.wawrzyniak.NoteApp.Service.Verifier.NoteVerifier;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +46,7 @@ public class NoteService {
     }
 
     public Page getByCriteria(PaginationInfo info){
+        info.setDefault();
         NoteCriteria criteria = criteriaMapper.dtoToCriteria(info.getCriteria());
         List<NoteDTO> notes = noteMapper.noteListToDTOList(noteRepository.findByCriteria(criteria, info.getOffset(), info.getPageNumber(), info.getPageSize()));
         PaginationInfo updatedInfo = new PaginationInfo();
@@ -73,7 +73,11 @@ public class NoteService {
         return this.noteMapper.noteToNoteDTO(noteRepository.save(noteToUpdate));
     }
 
-    public void deleteById(Long id){
+    public void deleteById(Long id) throws NoteNotExistsException {
+        Optional<Note> note = this.noteRepository.findById(id);
+        if(note.isEmpty()){
+            throw new NoteNotExistsException();
+        }
         this.noteRepository.deleteById(id);
     }
 }
