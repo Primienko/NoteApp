@@ -9,6 +9,7 @@ public class EmptyNoteVerifier implements NoteVerifier{
     @Override
     public void verify(NoteDTO note) throws EmptyNoteException {
         String text = note.getText();
+        if(text == null) {throw new EmptyNoteException();}
         if(text.trim().length() == 0) {
             throw new EmptyNoteException();
         }

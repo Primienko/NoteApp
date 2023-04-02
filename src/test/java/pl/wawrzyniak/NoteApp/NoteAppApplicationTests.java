@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -22,6 +23,8 @@ import pl.wawrzyniak.NoteApp.Service.DTO.NoteDTO;
 import pl.wawrzyniak.NoteApp.Service.DTO.Page;
 import pl.wawrzyniak.NoteApp.Service.DTO.PaginationInfo;
 
+
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -29,13 +32,8 @@ class NoteAppApplicationTests {
 	@Autowired
 	NoteRestController noteRestController;
 
-
-	private static void sleep(int ms){
-		try {
-			Thread.sleep(ms);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
+	private static void sleep(int s) throws InterruptedException {
+		TimeUnit.SECONDS.sleep(s);
 	}
 
 	private static String noteDtoToJson(NoteDTO noteDTO) throws JSONException {
@@ -270,7 +268,7 @@ class NoteAppApplicationTests {
 	}
 
 	@Test
-	void findByMinDateTest() throws JSONException {
+	void findByMinDateTest() throws JSONException, InterruptedException {
 		// given
 		NoteDTO note1 = new NoteDTO();
 		String noteContent1 = "Test v1 *";
@@ -282,9 +280,9 @@ class NoteAppApplicationTests {
 		String noteContent3 = "Test v3 *";
 		note3.setText(noteContent3);
 		note1 = saveOneNote(note1);
-		sleep(300);
+		sleep(1);
 		note2 = saveOneNote(note2);
-		sleep(300);
+		sleep(1);
 		note3 = saveOneNote(note3);
 
 		// when
@@ -304,7 +302,7 @@ class NoteAppApplicationTests {
 	}
 
 	@Test
-	void findByMaxDateTest() throws JSONException {
+	void findByMaxDateTest() throws JSONException, InterruptedException {
 		// given
 		NoteDTO note1 = new NoteDTO();
 		String noteContent1 = "Test v1 *";
@@ -316,9 +314,9 @@ class NoteAppApplicationTests {
 		String noteContent3 = "Test v3 *";
 		note3.setText(noteContent3);
 		note1 = saveOneNote(note1);
-		sleep(300);
+		sleep(1);
 		note2 = saveOneNote(note2);
-		sleep(300);
+		sleep(1);
 		note3 = saveOneNote(note3);
 
 		// when

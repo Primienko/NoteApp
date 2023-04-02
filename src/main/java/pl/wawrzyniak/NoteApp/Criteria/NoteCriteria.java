@@ -9,6 +9,7 @@ public class NoteCriteria {
     private String text;
     private LocalDateTime minUpdateTime;
     private LocalDateTime maxUpdateTime;
+    private Long userId;
 }
 
 

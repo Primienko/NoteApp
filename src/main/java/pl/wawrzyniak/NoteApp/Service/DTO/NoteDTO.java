@@ -10,4 +10,5 @@ public class NoteDTO {
     private Integer version;
     private String text;
     private LocalDateTime updateTime;
+    private Long userId;
 }

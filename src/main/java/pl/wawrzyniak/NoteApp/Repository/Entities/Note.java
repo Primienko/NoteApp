@@ -21,6 +21,9 @@ public class Note implements Serializable {
     private String text;
     @UpdateTimestamp
     private LocalDateTime updateTime;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
 
 
