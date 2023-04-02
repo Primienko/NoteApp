@@ -38,7 +38,7 @@ public class NoteRestController {
     }
 
     @DeleteMapping("")
-    public ResponseEntity deleteOne(@RequestParam Long id){
+    public ResponseEntity deleteOne(@RequestParam Long id) throws NoteNotExistsException {
         this.noteService.deleteById(id);
         return new ResponseEntity(HttpStatus.OK);
     }
